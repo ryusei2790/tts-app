@@ -76,8 +76,9 @@
 | 言語 | TypeScript | 型安全・補完が効く |
 | スタイリング | Tailwind CSS | 高速にUIを組める |
 | TTS SDK | @google-cloud/text-to-speech | 公式SDK・型定義あり |
+| 要約AI | @google/genai（Gemini API / gemini-2.5-flash） | 無料枠あり・設定シンプル |
 | インフラ | Docker（node:20-alpine） | ローカル環境を再現可能にする |
-| 認証 | サービスアカウント JSON（環境変数） | Docker 内でファイルパス管理不要 |
+| 認証 | サービスアカウント JSON（環境変数）+ Gemini API キー | Docker 内でファイルパス管理不要 |
 
 ---
 
@@ -94,6 +95,17 @@
     ↓ audio/mpeg レスポンス
 [ブラウザ]
     → 再生 / ダウンロード
+
+[ブラウザ]
+    ↓ マークダウンテキストを POST
+[Next.js Route Handler: /api/summarize]
+    ↓ generateContent()
+[Gemini API（gemini-2.5-flash）]
+    ↓ 要約テキスト
+[Next.js Route Handler]
+    ↓ JSON レスポンス
+[ブラウザ]
+    → 要約テキスト表示
 ```
 
 ---
@@ -117,8 +129,12 @@ tts-app/
     ├── app/
     │   ├── layout.tsx
     │   ├── page.tsx
+    │   ├── summarize/
+    │   │   └── page.tsx
     │   └── api/
-    │       └── tts/
+    │       ├── tts/
+    │       │   └── route.ts
+    │       └── summarize/
     │           └── route.ts
     └── components/
         ├── TextInput.tsx
@@ -133,6 +149,7 @@ tts-app/
 | 変数名 | 説明 | 必須 |
 |--------|------|------|
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | GCP サービスアカウント JSON（1行） | ✅ |
+| `GEMINI_API_KEY` | Gemini API キー（Google AI Studio で発行） | ✅ |
 
 ---
 
@@ -154,6 +171,32 @@ tts-app/
 ```
 Content-Type: audio/mpeg
 Body: MP3 バイナリ
+```
+
+**レスポンス（エラー時）**
+
+```json
+{
+  "error": "エラーメッセージ"
+}
+```
+
+### POST `/api/summarize`
+
+**リクエスト**
+
+```json
+{
+  "markdown": "要約するマークダウンテキスト（最大20,000文字）"
+}
+```
+
+**レスポンス（成功時）**
+
+```json
+{
+  "summary": "要約テキスト（2,000文字以内）"
+}
 ```
 
 **レスポンス（エラー時）**
