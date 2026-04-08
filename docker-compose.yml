@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  tts-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      # ホスト3000番 → コンテナ3000番にマッピング
+      - "3000:3000"
+    volumes:
+      # ソースコードをマウントしてホットリロードを有効化
+      - .:/app
+      # node_modulesはコンテナ内のものを使う（ホストと混在させない）
+      - /app/node_modules
+    environment:
+      # Next.jsをDocker内で外部アクセス可能にする
+      - HOSTNAME=0.0.0.0
+    env_file:
+      # GOOGLE_APPLICATION_CREDENTIALS_JSON はここから読み込む
+      - .env.local

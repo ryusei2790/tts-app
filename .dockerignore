@@ -1,0 +1,39 @@
+# Dependencies (Docker内でnpm installするため不要)
+node_modules/
+
+# Next.js build cache
+.next/
+out/
+
+# Environment variables (実行時に注入するため除外)
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker自身
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# ドキュメント
+docs/
+README.md
+
+# TypeScript build info
+*.tsbuildinfo
