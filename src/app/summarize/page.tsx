@@ -11,6 +11,14 @@ import { useState } from "react";
 import Link from "next/link";
 import TextInput from "@/components/TextInput";
 import SummaryResult from "@/components/SummaryResult";
+import Section from "@/components/section";
+import Container from "@/components/container";
+import Heading from "@/components/heading";
+import Text from "@/components/text";
+import Column from "@/components/column";
+import Row from "@/components/row";
+import Card from "@/components/card";
+import Button from "@/components/button";
 
 /**
  * 要約ページコンポーネント
@@ -54,53 +62,61 @@ export default function SummarizePage() {
   };
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12">
-      {/* ヘッダー */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">📝 要約ツール</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            マークダウンを貼り付けて2,000字以内の要約.txtを生成します
-          </p>
-        </div>
-        {/* TTSページへのリンク */}
-        <Link
-          href="/"
-          className="text-sm text-indigo-600 hover:underline"
-        >
-          ← 音声生成へ
-        </Link>
-      </div>
+    <Section padding="md">
+      <Container maxWidth="md" style={{ maxWidth: "720px" }}>
+        <Column gap="xl">
+          {/* ヘッダー */}
+          <Row alignItems="center" justifyContent="space-between">
+            <Column gap="xs">
+              <Heading tag="h1" fontClass="display2-bold">
+                要約ツール
+              </Heading>
+              <Text fontClass="body" color="outline">
+                マークダウンを貼り付けて2,000字以内の要約.txtを生成します
+              </Text>
+            </Column>
+            <Link href="/">
+              <Button label="音声生成へ" variant="text" color="primary" size="sm" startIcon="arrow-left" />
+            </Link>
+          </Row>
 
-      <div className="flex flex-col gap-6">
-        {/* マークダウン入力（既存のTextInputを流用） */}
-        <TextInput
-          value={markdown}
-          onChange={setMarkdown}
-          disabled={loading}
-        />
+          {/* メインフォーム */}
+          <Card variant="outline" scaleFactor="title2" opticalCorrection="all">
+            <Column gap="lg">
+              {/* マークダウン入力（既存のTextInputを流用） */}
+              <TextInput
+                value={markdown}
+                onChange={setMarkdown}
+                disabled={loading}
+              />
 
-        {/* 生成ボタン */}
-        <button
-          onClick={handleSummarize}
-          disabled={loading || markdown.trim().length === 0 || isOverLimit}
-          className="w-full rounded-lg bg-green-600 px-4 py-3 font-semibold text-white
-            hover:bg-green-700 active:bg-green-800 transition-colors
-            disabled:bg-gray-300 disabled:cursor-not-allowed"
-        >
-          {loading ? "要約中..." : "要約を生成する"}
-        </button>
+              {/* 生成ボタン */}
+              <Button
+                label={loading ? "要約中..." : "要約を生成する"}
+                variant="fill"
+                color="tertiary"
+                size="lg"
+                startIcon={loading ? "loader" : "file-text"}
+                disabled={loading || markdown.trim().length === 0 || isOverLimit}
+                onClick={handleSummarize}
+                modifiers="w-full justify-center"
+              />
+            </Column>
+          </Card>
 
-        {/* エラー表示 */}
-        {error && (
-          <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-            ❌ {error}
-          </div>
-        )}
+          {/* エラー表示 */}
+          {error && (
+            <Card variant="fill" bgColor="errorcontainer" scaleFactor="heading">
+              <Text fontClass="body" color="onerrorcontainer">
+                {error}
+              </Text>
+            </Card>
+          )}
 
-        {/* 要約結果 */}
-        <SummaryResult summary={summary} />
-      </div>
-    </main>
+          {/* 要約結果 */}
+          <SummaryResult summary={summary} />
+        </Column>
+      </Container>
+    </Section>
   );
 }

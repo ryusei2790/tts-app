@@ -1,10 +1,17 @@
 /**
  * @file VoiceSelector.tsx
  * @description 音声タイプ選択コンポーネント。
- * 要件定義書に定義された5種類の日本語音声から選択できるセレクトボックスを提供する。
+ * 要件定義書に定義された5種類の日本語音声から選択できる。
+ * LiftKit Select コンポーネントでカスタムドロップダウンを実現。
  */
 
 "use client";
+
+import Column from "@/components/column";
+import Text from "@/components/text";
+import { Select, SelectTrigger, SelectMenu, SelectOption } from "@/components/select";
+import Button from "@/components/button";
+import React from "react";
 
 /** 音声タイプの定義 */
 export interface VoiceOption {
@@ -64,39 +71,56 @@ interface VoiceSelectorProps {
 }
 
 /**
- * 音声タイプを選択するセレクトボックスコンポーネント
+ * 音声タイプを選択するカスタムドロップダウンコンポーネント
  */
 export default function VoiceSelector({ value, onChange, disabled = false }: VoiceSelectorProps) {
   const selected = VOICE_OPTIONS.find((v) => v.id === value);
 
+  const options = VOICE_OPTIONS.map((v) => ({
+    label: `${v.label} — ${v.description}`,
+    value: v.id,
+  }));
+
+  /**
+   * LiftKit Select の onChange は React.ChangeEvent<HTMLSelectElement> を返すため
+   * 内部で voiceId（string）に変換して親に渡す
+   */
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(e.target.value);
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor="voice-select" className="font-semibold text-gray-700">
+    <Column gap="xs">
+      <Text tag="label" fontClass="subheading-bold" color="onsurface">
         音声タイプ
-      </label>
+      </Text>
 
-      <select
-        id="voice-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm
-          focus:outline-none focus:ring-2 focus:ring-blue-300
-          disabled:bg-gray-100 disabled:cursor-not-allowed"
-      >
-        {VOICE_OPTIONS.map((voice) => (
-          <option key={voice.id} value={voice.id}>
-            {voice.label} — {voice.description}
-          </option>
-        ))}
-      </select>
-
-      {/* 選択中の音声の詳細情報 */}
-      {selected && (
-        <p className="text-xs text-gray-500">
-          種別：{selected.type} / 性別：{selected.gender}
-        </p>
-      )}
-    </div>
+      <div data-lk-select-disabled={disabled ? "true" : "false"}>
+        <Select options={options} value={value} onChange={handleChange} name="voice-select">
+          <SelectTrigger>
+            <Button
+              label={selected ? `${selected.label} — ${selected.description}` : "音声を選択"}
+              variant="outline"
+              color="onsurface"
+              size="md"
+              endIcon="chevron-down"
+              modifiers="w-full justify-between text-left"
+            />
+          </SelectTrigger>
+          <SelectMenu cardProps={{ variant: "fill", bgColor: "surfacecontainerlow" }}>
+            {VOICE_OPTIONS.map((voice) => (
+              <SelectOption key={voice.id} value={voice.id}>
+                <Column gap="none">
+                  <Text fontClass="body" tag="span">{voice.label}</Text>
+                  <Text fontClass="caption" color="outline" tag="span">
+                    {voice.description} / {voice.type} / {voice.gender}
+                  </Text>
+                </Column>
+              </SelectOption>
+            ))}
+          </SelectMenu>
+        </Select>
+      </div>
+    </Column>
   );
 }
