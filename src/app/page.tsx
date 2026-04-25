@@ -13,6 +13,14 @@ import TextInput from "@/components/TextInput";
 import VoiceSelector from "@/components/VoiceSelector";
 import AudioPlayer from "@/components/AudioPlayer";
 import { VOICE_OPTIONS } from "@/components/VoiceSelector";
+import Section from "@/components/section";
+import Container from "@/components/container";
+import Heading from "@/components/heading";
+import Text from "@/components/text";
+import Column from "@/components/column";
+import Row from "@/components/row";
+import Card from "@/components/card";
+import Button from "@/components/button";
 
 /**
  * メインページコンポーネント
@@ -45,16 +53,13 @@ export default function Home() {
       });
 
       if (!res.ok) {
-        // エラーレスポンスは JSON { error: string } 形式
         const data = await res.json();
         throw new Error(data.error ?? "音声生成に失敗しました");
       }
 
-      // 成功時はMP3バイナリが返ってくるのでBlobURLに変換する
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
 
-      // 前回のBlobURLをメモリ解放してから新しいURLをセット
       setAudioUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
         return url;
@@ -67,47 +72,60 @@ export default function Home() {
   };
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">🎙️ TTS App</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            テキストを貼り付けて音声を生成・再生・ダウンロードできます
-          </p>
-        </div>
-        <Link href="/summarize" className="text-sm text-green-600 hover:underline">
-          要約ツールへ →
-        </Link>
-      </div>
+    <Section padding="md">
+      <Container maxWidth="md" style={{ maxWidth: "720px" }}>
+        <Column gap="xl">
+          {/* ヘッダー */}
+          <Row alignItems="center" justifyContent="space-between">
+            <Column gap="xs">
+              <Heading tag="h1" fontClass="display2-bold">
+                TTS App
+              </Heading>
+              <Text fontClass="body" color="outline">
+                テキストを貼り付けて音声を生成・再生・ダウンロードできます
+              </Text>
+            </Column>
+            <Link href="/summarize">
+              <Button label="要約ツールへ" variant="text" color="tertiary" size="sm" endIcon="arrow-right" />
+            </Link>
+          </Row>
 
-      <div className="flex flex-col gap-6">
-        {/* テキスト入力 */}
-        <TextInput value={text} onChange={setText} disabled={loading} />
+          {/* メインフォーム */}
+          <Card variant="outline" scaleFactor="title2" opticalCorrection="all">
+            <Column gap="lg">
+              {/* テキスト入力 */}
+              <TextInput value={text} onChange={setText} disabled={loading} />
 
-        {/* 音声タイプ選択 */}
-        <VoiceSelector value={voice} onChange={setVoice} disabled={loading} />
+              {/* 音声タイプ選択 */}
+              <VoiceSelector value={voice} onChange={setVoice} disabled={loading} />
 
-        {/* 生成ボタン */}
-        <button
-          onClick={handleGenerate}
-          disabled={loading || text.trim().length === 0 || isOverLimit}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white
-            hover:bg-indigo-700 active:bg-indigo-800 transition-colors
-            disabled:bg-gray-300 disabled:cursor-not-allowed"
-        >
-          {loading ? "生成中..." : "音声を生成する"}
-        </button>
+              {/* 生成ボタン */}
+              <Button
+                label={loading ? "生成中..." : "音声を生成する"}
+                variant="fill"
+                color="primary"
+                size="lg"
+                startIcon={loading ? "loader" : "volume-2"}
+                disabled={loading || text.trim().length === 0 || isOverLimit}
+                onClick={handleGenerate}
+                modifiers="w-full justify-center"
+              />
+            </Column>
+          </Card>
 
-        {/* エラー表示 */}
-        {error && (
-          <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-            ❌ {error}
-          </div>
-        )}
+          {/* エラー表示 */}
+          {error && (
+            <Card variant="fill" bgColor="errorcontainer" scaleFactor="heading">
+              <Text fontClass="body" color="onerrorcontainer">
+                {error}
+              </Text>
+            </Card>
+          )}
 
-        {/* 音声プレーヤー */}
-        <AudioPlayer audioUrl={audioUrl} />
-      </div>
-    </main>
+          {/* 音声プレーヤー */}
+          <AudioPlayer audioUrl={audioUrl} />
+        </Column>
+      </Container>
+    </Section>
   );
 }

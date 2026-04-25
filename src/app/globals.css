@@ -1,3 +1,54 @@
+@import url("@/lib/css/index.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* LiftKit Button disabled state */
+[data-lk-component="button"]:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* LiftKit Select trigger disabled state */
+[data-lk-select-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Custom textarea styled with LiftKit golden-ratio variables */
+.lk-textarea {
+  width: 100%;
+  border: 1px solid var(--lk-outlinevariant);
+  border-radius: calc(var(--lk-size-xs));
+  padding: var(--lk-size-sm);
+  font-size: var(--body-font-size);
+  line-height: var(--lk-halfstep);
+  font-family: inherit;
+  color: var(--lk-onsurface);
+  background: var(--lk-surfacecontainerlowest);
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lk-textarea:focus {
+  outline: none;
+  border-color: var(--lk-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lk-primary) 25%, transparent);
+}
+
+.lk-textarea:disabled {
+  background: var(--lk-surfacecontainerhigh);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.lk-textarea--error {
+  border-color: var(--lk-error);
+}
+
+.lk-textarea--error:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lk-error) 25%, transparent);
+}

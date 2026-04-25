@@ -2,9 +2,16 @@
  * @file SummaryResult.tsx
  * @description 要約結果の表示・.txtダウンロードコンポーネント。
  * 生成された要約テキストを表示し、.txtファイルとしてダウンロードできる。
+ * LiftKit Card + Button でスタイリング。
  */
 
 "use client";
+
+import Card from "@/components/card";
+import Column from "@/components/column";
+import Row from "@/components/row";
+import Text from "@/components/text";
+import Button from "@/components/button";
 
 interface SummaryResultProps {
   /** 生成された要約テキスト（null の場合は非表示） */
@@ -23,7 +30,6 @@ export default function SummaryResult({ summary }: SummaryResultProps) {
    * UTF-8 BOM を付与することで Windows のメモ帳でも文字化けしない。
    */
   const handleDownload = () => {
-    // UTF-8 BOM + テキスト本文
     const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
     const content = new TextEncoder().encode(summary);
     const blob = new Blob([bom, content], { type: "text/plain;charset=utf-8" });
@@ -37,27 +43,37 @@ export default function SummaryResult({ summary }: SummaryResultProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-green-200 bg-green-50 p-4">
-      <p className="text-sm font-semibold text-green-700">✅ 要約が生成されました</p>
+    <Card variant="fill" bgColor="tertiarycontainer" scaleFactor="title2" opticalCorrection="all">
+      <Column gap="lg">
+        <Text fontClass="subheading-bold" color="ontertiarycontainer">
+          要約が生成されました
+        </Text>
 
-      {/* 要約テキスト表示エリア */}
-      <div className="rounded-lg border border-green-200 bg-white p-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-        {summary}
-      </div>
+        {/* 要約テキスト表示エリア */}
+        <Card variant="fill" bgColor="surfacecontainerlowest" scaleFactor="body" opticalCorrection="all">
+          <Text fontClass="body" color="onsurface" style={{ whiteSpace: "pre-wrap", lineHeight: "var(--lk-wholestep)" }}>
+            {summary}
+          </Text>
+        </Card>
 
-      {/* 文字数表示 */}
-      <p className="text-right text-xs text-gray-500">
-        {summary.length.toLocaleString()} 文字
-      </p>
+        {/* 文字数表示 */}
+        <Row justifyContent="end">
+          <Text fontClass="caption" color="ontertiarycontainer">
+            {summary.length.toLocaleString()} 文字
+          </Text>
+        </Row>
 
-      {/* ダウンロードボタン */}
-      <button
-        onClick={handleDownload}
-        className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white
-          hover:bg-green-700 active:bg-green-800 transition-colors"
-      >
-        .txt をダウンロード
-      </button>
-    </div>
+        {/* ダウンロードボタン */}
+        <Button
+          label=".txt をダウンロード"
+          variant="fill"
+          color="tertiary"
+          size="md"
+          startIcon="download"
+          onClick={handleDownload}
+          modifiers="w-full justify-center"
+        />
+      </Column>
+    </Card>
   );
 }
